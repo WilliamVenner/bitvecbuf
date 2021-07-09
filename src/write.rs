@@ -72,6 +72,13 @@ impl<O: BitOrder> BitVecWriter<O> {
 		self.advance(bits.len());
 	}
 
+	pub fn write_bytes<B: AsRef<[u8]>>(&mut self, bytes: B) {
+		let bytes = bytes.as_ref();
+		let bits = bytes.view_bits();
+		self.bitvec.extend_from_bitslice::<O, u8>(bits);
+		self.advance(bits.len());
+	}
+
 	pub fn write_float<N>(&mut self, float: N)
 	where
 		N: IsNumber + IsFloat + IntoBitView,
@@ -80,13 +87,6 @@ impl<O: BitOrder> BitVecWriter<O> {
 		let bits = float.view_bits();
 		self.bitvec
 			.extend_from_bitslice::<O, <<N as IntoBitView>::Unsigned as BitView>::Store>(bits);
-		self.advance(bits.len());
-	}
-
-	pub fn write_bytes<B: AsRef<[u8]>>(&mut self, bytes: B) {
-		let bytes = bytes.as_ref();
-		let bits = bytes.view_bits();
-		self.bitvec.extend_from_bitslice::<O, u8>(bits);
 		self.advance(bits.len());
 	}
 

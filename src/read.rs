@@ -117,6 +117,21 @@ where
 		byte
 	}
 
+	pub fn read_bytes(&mut self, len: usize) -> Option<Vec<u8>> {
+		let len_bits = len * 8;
+		let range = self.check_range(len_bits)?;
+
+		let mut bytes = Vec::with_capacity(len);
+		for i in range.step_by(8) {
+			let byte: u8 = self.bitvec[i..i+8].load_bits();
+			bytes.push(byte);
+		}
+
+		self.advance(len_bits);
+
+		Some(bytes)
+	}
+
 	#[inline]
 	pub fn read_uint<N>(&mut self, bits: usize) -> Option<N>
 	where
@@ -150,21 +165,6 @@ where
 			.map(|float: <N as FromBitMemory>::Unsigned| N::from_bitmemory(float, N::BIT_COUNT));
 		self.advance(N::BIT_COUNT);
 		float
-	}
-
-	pub fn read_bytes(&mut self, len: usize) -> Option<Vec<u8>> {
-		let len_bits = len * 8;
-		let range = self.check_range(len_bits)?;
-
-		let mut bytes = Vec::with_capacity(len);
-		for i in range.step_by(8) {
-			let byte: u8 = self.bitvec[i..i+8].load_bits();
-			bytes.push(byte);
-		}
-
-		self.advance(len_bits);
-
-		Some(bytes)
 	}
 
 	#[inline]
