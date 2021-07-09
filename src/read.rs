@@ -13,8 +13,8 @@ use crate::BitCount;
 
 #[derive(Debug, Clone)]
 pub struct BitVecReader<O: BitOrder> {
-	cursor: usize,
-	bitvec: BitVec<O, u8>,
+	pub cursor: usize,
+	pub bitvec: BitVec<O, u8>,
 }
 impl<O: BitOrder> BitVecReader<O>
 where

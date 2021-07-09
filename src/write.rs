@@ -9,8 +9,8 @@ use crate::BitCount;
 
 #[derive(Debug, Clone, Default)]
 pub struct BitVecWriter<O: BitOrder> {
-	cursor: usize,
-	bitvec: BitVec<O, u8>,
+	pub cursor: usize,
+	pub bitvec: BitVec<O, u8>,
 }
 impl<O: BitOrder> BitVecWriter<O> {
 	#[inline]
