@@ -1,6 +1,6 @@
 use bitvec::{macros::internal::funty::{IsFloat, IsNumber, IsSigned, IsUnsigned}, order::{BitOrder, Lsb0, Msb0}, vec::BitVec, view::{AsBits, BitView}};
 
-use crate::read::BitCount;
+use crate::BitCount;
 
 #[derive(Debug, Clone, Default)]
 pub struct BitVecWriter<O: BitOrder> {
@@ -56,7 +56,7 @@ impl<O: BitOrder> BitVecWriter<O> {
 	pub fn rewind(&mut self, n: usize) {
 		self.cursor -= n;
 	}
-	
+
 	#[inline]
 	pub fn write_bit(&mut self, bit: bool) {
 		self.bitvec.push(bit);

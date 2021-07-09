@@ -2,6 +2,8 @@ use std::{io::Read, ops::Range, string::FromUtf8Error};
 
 use bitvec::{field::BitField, macros::internal::funty::{IsFloat, IsNumber, IsSigned, IsUnsigned}, mem::{BitMemory}, order::{BitOrder, Lsb0, Msb0}, slice::BitSlice, vec::BitVec};
 
+use crate::BitCount;
+
 #[derive(Debug, Clone)]
 pub struct BitVecReader<O: BitOrder> {
 	cursor: usize,
@@ -92,7 +94,7 @@ impl<O: BitOrder> BitVecReader<O> where BitSlice<O, u8>: BitField + LoadBits<O> 
 	{
 		Some(&self.bitvec[self.check_range(max)?])
 	}
-	
+
 	#[inline]
 	pub fn read_bit(&mut self) -> Option<bool> {
 		let bit = self.bitvec.get(self.cursor).map(|bit| *bit);
@@ -277,41 +279,3 @@ impl_into_bitmemory!(i64, u64);
 impl_into_bitmemory!(isize, usize);
 impl_into_bitmemory_float!(f32);
 impl_into_bitmemory_float!(f64);
-
-pub trait BitCount {
-	const BIT_COUNT: usize;
-}
-macro_rules! impl_bit_count {
-	( $ty:ty, $n:literal ) => {
-		impl BitCount for $ty {
-			const BIT_COUNT: usize = $n;
-		}
-	};
-}
-impl_bit_count!(u8, 8);
-impl_bit_count!(u16, 16);
-impl_bit_count!(u32, 32);
-impl_bit_count!(u64, 64);
-impl_bit_count!(u128, 128);
-impl_bit_count!(i8, 8);
-impl_bit_count!(i16, 16);
-impl_bit_count!(i32, 32);
-impl_bit_count!(i64, 64);
-impl_bit_count!(i128, 128);
-impl_bit_count!(f32, 32);
-impl_bit_count!(f64, 64);
-
-#[cfg(target_pointer_width = "128")]
-impl_bit_count!(isize, 128);
-#[cfg(target_pointer_width = "128")]
-impl_bit_count!(usize, 128);
-
-#[cfg(target_pointer_width = "64")]
-impl_bit_count!(isize, 64);
-#[cfg(target_pointer_width = "64")]
-impl_bit_count!(usize, 64);
-
-#[cfg(target_pointer_width = "32")]
-impl_bit_count!(isize, 32);
-#[cfg(target_pointer_width = "32")]
-impl_bit_count!(usize, 32);
