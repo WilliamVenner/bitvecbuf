@@ -58,6 +58,7 @@ test!(
 	}
 );
 
+#[cfg(target_pointer_width = "64")]
 test!(
 	test_write_double_lsb,
 	test_write_double_msb,

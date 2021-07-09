@@ -189,7 +189,10 @@ macro_rules! impl_into_bitview_float {
 impl_into_bitview!(i8, u8);
 impl_into_bitview!(i16, u16);
 impl_into_bitview!(i32, u32);
-impl_into_bitview!(i64, u64);
 impl_into_bitview!(isize, usize);
 impl_into_bitview_float!(f32);
+
+#[cfg(target_pointer_width = "64")]
+impl_into_bitview!(i64, u64);
+#[cfg(target_pointer_width = "64")]
 impl_into_bitview_float!(f64);

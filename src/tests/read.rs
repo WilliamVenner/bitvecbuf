@@ -93,6 +93,7 @@ test!(
 	}
 );
 
+#[cfg(target_pointer_width = "64")]
 test!(
 	test_read_double_lsb,
 	test_read_double_msb,
