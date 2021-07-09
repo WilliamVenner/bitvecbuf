@@ -11,6 +11,9 @@ mod write;
 pub use read::BitVecReader;
 pub use write::BitVecWriter;
 
+pub use bitvec;
+pub use bitvec::order::{LocalBits, Lsb0, Msb0};
+
 pub trait BitCount {
 	const BIT_COUNT: usize;
 }
