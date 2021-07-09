@@ -159,10 +159,10 @@ test!(
 );
 
 test!(
-	test_test_read_bytes_lsb,
-	test_test_read_bytes_msb,
-	bench_test_read_bytes_lsb,
-	bench_test_read_bytes_msb,
+	test_read_bytes_lsb,
+	test_read_bytes_msb,
+	bench_read_bytes_lsb,
+	bench_read_bytes_msb,
 	{
 		let mut bitbuf = BitVecWriter::<Endian>::default();
 		bitbuf.write_bytes(b"Hello, world!");

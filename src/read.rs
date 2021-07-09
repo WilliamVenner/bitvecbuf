@@ -152,14 +152,17 @@ where
 		float
 	}
 
-	pub fn read_bytes(&mut self, bytes: usize) -> Option<Vec<u8>> {
-		let bytes_bits = bytes * 8;
-		let mut bits = self.read_bits(bytes_bits)?;
+	pub fn read_bytes(&mut self, len: usize) -> Option<Vec<u8>> {
+		let len_bits = len * 8;
+		let range = self.check_range(len_bits)?;
 
-		let mut bytes: Vec<u8> = vec![0; bytes];
-		bits.read_exact(&mut bytes).ok()?;
+		let mut bytes = Vec::with_capacity(len);
+		for i in range.step_by(8) {
+			let byte: u8 = self.bitvec[i..i+8].load_bits();
+			bytes.push(byte);
+		}
 
-		self.advance(bytes_bits);
+		self.advance(len_bits);
 
 		Some(bytes)
 	}
