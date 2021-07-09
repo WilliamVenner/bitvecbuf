@@ -5,11 +5,11 @@ extern crate test;
 #[cfg(test)]
 mod tests;
 
-mod write;
 mod read;
+mod write;
 
-pub use write::BitVecWriter;
 pub use read::BitVecReader;
+pub use write::BitVecWriter;
 
 pub trait BitCount {
 	const BIT_COUNT: usize;

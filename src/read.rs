@@ -1,28 +1,35 @@
 use std::{io::Read, ops::Range, string::FromUtf8Error};
 
-use bitvec::{field::BitField, macros::internal::funty::{IsFloat, IsNumber, IsSigned, IsUnsigned}, mem::{BitMemory}, order::{BitOrder, Lsb0, Msb0}, slice::BitSlice, vec::BitVec};
+use bitvec::{
+	field::BitField,
+	macros::internal::funty::{IsFloat, IsNumber, IsSigned, IsUnsigned},
+	mem::BitMemory,
+	order::{BitOrder, Lsb0, Msb0},
+	slice::BitSlice,
+	vec::BitVec,
+};
 
 use crate::BitCount;
 
 #[derive(Debug, Clone)]
 pub struct BitVecReader<O: BitOrder> {
 	cursor: usize,
-	bitvec: BitVec<O, u8>
+	bitvec: BitVec<O, u8>,
 }
-impl<O: BitOrder> BitVecReader<O> where BitSlice<O, u8>: BitField + LoadBits<O> {
+impl<O: BitOrder> BitVecReader<O>
+where
+	BitSlice<O, u8>: BitField + LoadBits<O>,
+{
 	#[inline]
 	pub fn new(bitvec: BitVec<O, u8>) -> BitVecReader<O> {
-		BitVecReader {
-			cursor: 0,
-			bitvec
-		}
+		BitVecReader { cursor: 0, bitvec }
 	}
 
 	#[inline]
-	pub fn from_bytes(bytes: Vec<u8>)-> BitVecReader<O> {
+	pub fn from_bytes(bytes: Vec<u8>) -> BitVecReader<O> {
 		BitVecReader {
 			cursor: 0,
-			bitvec: BitVec::from_vec(bytes)
+			bitvec: BitVec::from_vec(bytes),
 		}
 	}
 
@@ -90,7 +97,7 @@ impl<O: BitOrder> BitVecReader<O> where BitSlice<O, u8>: BitField + LoadBits<O> 
 	#[inline]
 	fn read_bits(&self, max: usize) -> Option<&BitSlice<O, u8>>
 	where
-		BitSlice<O, u8>: BitField + LoadBits<O>
+		BitSlice<O, u8>: BitField + LoadBits<O>,
 	{
 		Some(&self.bitvec[self.check_range(max)?])
 	}
@@ -113,7 +120,7 @@ impl<O: BitOrder> BitVecReader<O> where BitSlice<O, u8>: BitField + LoadBits<O> 
 	#[inline]
 	pub fn read_uint<N>(&mut self, bits: usize) -> Option<N>
 	where
-		N: BitMemory + IsNumber + IsUnsigned
+		N: BitMemory + IsNumber + IsUnsigned,
 	{
 		let uint = self.read_bits(bits)?;
 		let uint: Option<N> = Some(uint.load_bits());
@@ -124,10 +131,11 @@ impl<O: BitOrder> BitVecReader<O> where BitSlice<O, u8>: BitField + LoadBits<O> 
 	#[inline]
 	pub fn read_int<N>(&mut self, bits: usize) -> Option<N>
 	where
-		N: FromBitMemory + IsNumber + IsSigned
+		N: FromBitMemory + IsNumber + IsSigned,
 	{
 		let int = self.read_bits(bits)?;
-		let int: Option<N> = Some(int.load_bits()).map(|int: <N as FromBitMemory>::Unsigned| N::from_bitmemory(int, bits));
+		let int: Option<N> = Some(int.load_bits())
+			.map(|int: <N as FromBitMemory>::Unsigned| N::from_bitmemory(int, bits));
 		self.advance(bits);
 		int
 	}
@@ -135,10 +143,11 @@ impl<O: BitOrder> BitVecReader<O> where BitSlice<O, u8>: BitField + LoadBits<O> 
 	#[inline]
 	pub fn read_float<N>(&mut self) -> Option<N>
 	where
-		N: FromBitMemory + IsNumber + IsFloat
+		N: FromBitMemory + IsNumber + IsFloat,
 	{
 		let float = self.read_bits(N::BIT_COUNT)?;
-		let float: Option<N> = Some(float.load_bits()).map(|float: <N as FromBitMemory>::Unsigned| N::from_bitmemory(float, N::BIT_COUNT));
+		let float: Option<N> = Some(float.load_bits())
+			.map(|float: <N as FromBitMemory>::Unsigned| N::from_bitmemory(float, N::BIT_COUNT));
 		self.advance(N::BIT_COUNT);
 		float
 	}
@@ -157,7 +166,8 @@ impl<O: BitOrder> BitVecReader<O> where BitSlice<O, u8>: BitField + LoadBits<O> 
 
 	#[inline]
 	pub unsafe fn read_string_unchecked(&mut self, bytes: usize) -> Option<String> {
-		self.read_bytes(bytes).map(|bytes| String::from_utf8_unchecked(bytes))
+		self.read_bytes(bytes)
+			.map(|bytes| String::from_utf8_unchecked(bytes))
 	}
 
 	#[inline]
@@ -167,7 +177,8 @@ impl<O: BitOrder> BitVecReader<O> where BitSlice<O, u8>: BitField + LoadBits<O> 
 
 	#[inline]
 	pub fn read_string_lossy(&mut self, bytes: usize) -> Option<String> {
-		self.read_bytes(bytes).map(|bytes| String::from_utf8_lossy(&bytes).into_owned())
+		self.read_bytes(bytes)
+			.map(|bytes| String::from_utf8_lossy(&bytes).into_owned())
 	}
 
 	pub fn read_nul_string(&mut self) -> Option<Result<String, FromUtf8Error>> {
@@ -213,7 +224,10 @@ impl<O: BitOrder> BitVecReader<O> where BitSlice<O, u8>: BitField + LoadBits<O> 
 	}
 }
 
-impl<O: BitOrder> From<Vec<u8>> for BitVecReader<O> where BitSlice<O, u8>: BitField + LoadBits<O> {
+impl<O: BitOrder> From<Vec<u8>> for BitVecReader<O>
+where
+	BitSlice<O, u8>: BitField + LoadBits<O>,
+{
 	fn from(bytes: Vec<u8>) -> Self {
 		BitVecReader::from_bytes(bytes)
 	}
@@ -221,25 +235,25 @@ impl<O: BitOrder> From<Vec<u8>> for BitVecReader<O> where BitSlice<O, u8>: BitFi
 
 pub trait LoadBits<O: BitOrder>
 where
-	BitSlice<O, u8>: BitField
+	BitSlice<O, u8>: BitField,
 {
 	fn load_bits<M: BitMemory>(&self) -> M;
 }
 impl<O: BitOrder> LoadBits<O> for BitSlice<Lsb0, u8>
 where
-	BitSlice<O, u8>: BitField
+	BitSlice<O, u8>: BitField,
 {
-    fn load_bits<M: BitMemory>(&self) -> M {
-        self.load_le()
-    }
+	fn load_bits<M: BitMemory>(&self) -> M {
+		self.load_le()
+	}
 }
 impl<O: BitOrder> LoadBits<O> for BitSlice<Msb0, u8>
 where
-	BitSlice<O, u8>: BitField
+	BitSlice<O, u8>: BitField,
 {
-    fn load_bits<M: BitMemory>(&self) -> M {
-        self.load_be()
-    }
+	fn load_bits<M: BitMemory>(&self) -> M {
+		self.load_be()
+	}
 }
 
 pub trait FromBitMemory: BitCount {

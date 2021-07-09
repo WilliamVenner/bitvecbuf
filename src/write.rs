@@ -1,19 +1,21 @@
-use bitvec::{macros::internal::funty::{IsFloat, IsNumber, IsSigned, IsUnsigned}, order::{BitOrder, Lsb0, Msb0}, vec::BitVec, view::{AsBits, BitView}};
+use bitvec::{
+	macros::internal::funty::{IsFloat, IsNumber, IsSigned, IsUnsigned},
+	order::{BitOrder, Lsb0, Msb0},
+	vec::BitVec,
+	view::{AsBits, BitView},
+};
 
 use crate::BitCount;
 
 #[derive(Debug, Clone, Default)]
 pub struct BitVecWriter<O: BitOrder> {
 	cursor: usize,
-	bitvec: BitVec<O, u8>
+	bitvec: BitVec<O, u8>,
 }
 impl<O: BitOrder> BitVecWriter<O> {
 	#[inline]
 	pub fn new(bitvec: BitVec<O, u8>) -> BitVecWriter<O> {
-		BitVecWriter {
-			cursor: 0,
-			bitvec
-		}
+		BitVecWriter { cursor: 0, bitvec }
 	}
 
 	#[inline]
@@ -72,11 +74,12 @@ impl<O: BitOrder> BitVecWriter<O> {
 
 	pub fn write_float<N>(&mut self, float: N)
 	where
-		N: IsNumber + IsFloat + IntoBitView
+		N: IsNumber + IsFloat + IntoBitView,
 	{
 		let float = float.into_bitview();
 		let bits = float.view_bits();
-		self.bitvec.extend_from_bitslice::<O, <<N as IntoBitView>::Unsigned as BitView>::Store>(bits);
+		self.bitvec
+			.extend_from_bitslice::<O, <<N as IntoBitView>::Unsigned as BitView>::Store>(bits);
 		self.advance(bits.len());
 	}
 
@@ -103,17 +106,18 @@ impl<O: BitOrder> BitVecWriter<O> {
 impl BitVecWriter<Msb0> {
 	pub fn write_int<N>(&mut self, int: N, bits: usize)
 	where
-		N: IsNumber + IsSigned + IntoBitView + BitCount
+		N: IsNumber + IsSigned + IntoBitView + BitCount,
 	{
 		let int = int.into_bitview();
 		let bits = &int.view_bits()[(N::BIT_COUNT - bits)..];
-		self.bitvec.extend_from_bitslice::<Msb0, <<N as IntoBitView>::Unsigned as BitView>::Store>(bits);
+		self.bitvec
+			.extend_from_bitslice::<Msb0, <<N as IntoBitView>::Unsigned as BitView>::Store>(bits);
 		self.advance(bits.len());
 	}
 
 	pub fn write_uint<N>(&mut self, uint: N, bits: usize)
 	where
-		N: BitView + IsNumber + IsUnsigned + BitCount
+		N: BitView + IsNumber + IsUnsigned + BitCount,
 	{
 		let bits = &uint.view_bits()[(N::BIT_COUNT - bits)..];
 		self.bitvec.extend_from_bitslice::<Msb0, N::Store>(bits);
@@ -123,17 +127,18 @@ impl BitVecWriter<Msb0> {
 impl BitVecWriter<Lsb0> {
 	pub fn write_int<N>(&mut self, int: N, bits: usize)
 	where
-		N: IsNumber + IsSigned + IntoBitView
+		N: IsNumber + IsSigned + IntoBitView,
 	{
 		let int = int.into_bitview();
 		let bits = &int.view_bits()[..bits];
-		self.bitvec.extend_from_bitslice::<Lsb0, <<N as IntoBitView>::Unsigned as BitView>::Store>(bits);
+		self.bitvec
+			.extend_from_bitslice::<Lsb0, <<N as IntoBitView>::Unsigned as BitView>::Store>(bits);
 		self.advance(bits.len());
 	}
 
 	pub fn write_uint<N>(&mut self, uint: N, bits: usize)
 	where
-		N: BitView + IsNumber + IsUnsigned
+		N: BitView + IsNumber + IsUnsigned,
 	{
 		let bits = &uint.view_bits()[..bits];
 		self.bitvec.extend_from_bitslice::<Lsb0, N::Store>(bits);
