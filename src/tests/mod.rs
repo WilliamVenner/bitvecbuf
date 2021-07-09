@@ -1,39 +1,77 @@
 macro_rules! test {
-	($lsb:ident, $msb:ident, $test:block) => {
+	($test_lsb:ident, $test_msb:ident, $bench_lsb:ident, $bench_msb:ident, $code:block) => {
 		#[test]
-		fn $lsb() {
+		fn $test_lsb() {
 			#[allow(unused)]
 			use crate::{BitVecReader, BitVecWriter};
 			type Endian = bitvec::prelude::Lsb0;
-			$test
+			$code
 		}
 
 		#[test]
-		fn $msb() {
+		fn $test_msb() {
 			#[allow(unused)]
 			use crate::{BitVecReader, BitVecWriter};
 			type Endian = bitvec::prelude::Msb0;
-			$test
+			$code
+		}
+
+		#[cfg(all(feature = "nightly", test))]
+		#[bench]
+		fn $bench_lsb(b: &mut test::Bencher) {
+			#[allow(unused)]
+			use crate::{BitVecReader, BitVecWriter};
+			type Endian = bitvec::prelude::Lsb0;
+			b.iter(|| $code);
+		}
+
+		#[cfg(all(feature = "nightly", test))]
+		#[bench]
+		fn $bench_msb(b: &mut test::Bencher) {
+			#[allow(unused)]
+			use crate::{BitVecReader, BitVecWriter};
+			type Endian = bitvec::prelude::Msb0;
+			b.iter(|| $code);
 		}
 	};
 
-	($lsb:ident, $msb:ident, $result_var_name:ident, $lsb_result:expr, $msb_result:expr, $test:block) => {
+	($test_lsb:ident, $test_msb:ident, $bench_lsb:ident, $bench_msb:ident, $result_var_name:ident, $lsb_result:expr, $msb_result:expr, $code:block) => {
 		#[test]
-		fn $lsb() {
+		fn $test_lsb() {
 			#[allow(unused)]
 			use crate::{BitVecReader, BitVecWriter};
 			type Endian = bitvec::prelude::Lsb0;
 			let $result_var_name = $lsb_result;
-			$test
+			$code
 		}
 
 		#[test]
-		fn $msb() {
+		fn $test_msb() {
 			#[allow(unused)]
 			use crate::{BitVecReader, BitVecWriter};
 			type Endian = bitvec::prelude::Msb0;
 			let $result_var_name = $msb_result;
-			$test
+			$code
+		}
+
+		#[cfg(all(feature = "nightly", test))]
+		#[bench]
+		fn $bench_lsb(b: &mut test::Bencher) {
+			#[allow(unused)]
+			use crate::{BitVecReader, BitVecWriter};
+			type Endian = bitvec::prelude::Lsb0;
+			let $result_var_name = $lsb_result;
+			b.iter(|| $code);
+		}
+
+		#[cfg(all(feature = "nightly", test))]
+		#[bench]
+		fn $bench_msb(b: &mut test::Bencher) {
+			#[allow(unused)]
+			use crate::{BitVecReader, BitVecWriter};
+			type Endian = bitvec::prelude::Msb0;
+			let $result_var_name = $msb_result;
+			b.iter(|| $code);
 		}
 	};
 }

@@ -1,6 +1,4 @@
-test!(read_bit_lsb, read_bit_msb, {
-	use crate::{BitVecReader, BitVecWriter};
-
+test!(test_read_bit_lsb, test_read_bit_msb, bench_read_bit_lsb, bench_read_bit_msb, {
 	let mut bitbuf = BitVecWriter::<Endian>::default();
 	bitbuf.write_bit(true);
 	bitbuf.write_bit(false);
@@ -13,9 +11,7 @@ test!(read_bit_lsb, read_bit_msb, {
 	assert_eq!(bitbuf.read_bit(), None);
 });
 
-test!(read_byte_lsb, read_byte_msb, {
-	use crate::{BitVecReader, BitVecWriter};
-
+test!(test_read_byte_lsb, test_read_byte_msb, bench_read_byte_lsb, bench_read_byte_msb, {
 	let mut bitbuf = BitVecWriter::<Endian>::default();
 	bitbuf.write_byte(69);
 	bitbuf.write_byte(50);
@@ -26,9 +22,7 @@ test!(read_byte_lsb, read_byte_msb, {
 	assert_eq!(bitbuf.read_byte(), None);
 });
 
-test!(read_uint_lsb, read_uint_msb, {
-	use crate::{BitVecReader, BitVecWriter};
-
+test!(test_read_uint_lsb, test_read_uint_msb, bench_read_uint_lsb, bench_read_uint_msb, {
 	let mut bitbuf = BitVecWriter::<Endian>::default();
 	bitbuf.write_uint(69_u16, 12);
 	bitbuf.write_uint(12_u16, 15);
@@ -41,9 +35,7 @@ test!(read_uint_lsb, read_uint_msb, {
 	assert_eq!(bitbuf.read_uint(16), None::<u16>);
 });
 
-test!(read_int_lsb, read_int_msb, {
-	use crate::{BitVecReader, BitVecWriter};
-
+test!(test_read_int_lsb, test_read_int_msb, bench_read_int_lsb, bench_read_int_msb, {
 	let mut bitbuf = BitVecWriter::<Endian>::default();
 	bitbuf.write_int(-69_i16, 14);
 	bitbuf.write_int(-12_i16, 15);
@@ -56,9 +48,7 @@ test!(read_int_lsb, read_int_msb, {
 	assert_eq!(bitbuf.read_int(16), None::<i16>);
 });
 
-test!(read_float_lsb, read_float_msb, {
-	use crate::{BitVecReader, BitVecWriter};
-
+test!(test_read_float_lsb, test_read_float_msb, bench_read_float_lsb, bench_read_float_msb, {
 	let mut bitbuf = BitVecWriter::<Endian>::default();
 	bitbuf.write_float(69.69_f32);
 	bitbuf.write_float(0.01_f32);
@@ -73,9 +63,7 @@ test!(read_float_lsb, read_float_msb, {
 	assert_eq!(bitbuf.read_float(), None::<f32>);
 });
 
-test!(read_double_lsb, read_double_msb, {
-	use crate::{BitVecReader, BitVecWriter};
-
+test!(test_read_double_lsb, test_read_double_msb, bench_read_double_lsb, bench_read_double_msb, {
 	let mut bitbuf = BitVecWriter::<Endian>::default();
 	bitbuf.write_float(69.69_f64);
 	bitbuf.write_float(0.01_f64);
@@ -90,9 +78,7 @@ test!(read_double_lsb, read_double_msb, {
 	assert_eq!(bitbuf.read_float(), None::<f64>);
 });
 
-test!(read_string_lsb, read_string_msb, {
-	use crate::{BitVecReader, BitVecWriter};
-
+test!(test_read_string_lsb, test_read_string_msb, bench_read_string_lsb, bench_read_string_msb, {
 	let mut bitbuf = BitVecWriter::<Endian>::default();
 	bitbuf.write_string("Hello, world!");
 	bitbuf.write_string("Hello, world!");
@@ -112,7 +98,7 @@ test!(read_string_lsb, read_string_msb, {
 	assert_eq!(bitbuf.read_nul_string_lossy(), Some("Hello, world!".to_string()));
 });
 
-test!(test_read_bytes_lsb, test_read_bytes_msb, {
+test!(test_test_read_bytes_lsb, test_test_read_bytes_msb, bench_test_read_bytes_lsb, bench_test_read_bytes_msb, {
 	let mut bitbuf = BitVecWriter::<Endian>::default();
 	bitbuf.write_bytes(b"Hello, world!");
 
