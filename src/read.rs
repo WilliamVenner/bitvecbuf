@@ -1,4 +1,4 @@
-use std::{io::Read, ops::Range, string::FromUtf8Error};
+use std::{ops::Range, string::FromUtf8Error};
 
 use bitvec::{
 	field::BitField,
