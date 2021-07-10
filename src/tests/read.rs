@@ -9,11 +9,10 @@ test!(
 		bitbuf.write_bit(false);
 		bitbuf.write_bit(true);
 
-		let mut bitbuf = BitVecReader::<Endian>::new(bitbuf.into_bitvec());
+		let mut bitbuf = BitVecReader::<Endian>::from_bytes(bitbuf.into_bytes());
 		assert_eq!(bitbuf.read_bit(), Some(true));
 		assert_eq!(bitbuf.read_bit(), Some(false));
 		assert_eq!(bitbuf.read_bit(), Some(true));
-		assert_eq!(bitbuf.read_bit(), None);
 	}
 );
 
@@ -27,7 +26,7 @@ test!(
 		bitbuf.write_byte(69);
 		bitbuf.write_byte(50);
 
-		let mut bitbuf = BitVecReader::<Endian>::new(bitbuf.into_bitvec());
+		let mut bitbuf = BitVecReader::<Endian>::from_bytes(bitbuf.into_bytes());
 		assert_eq!(bitbuf.read_byte(), Some(69));
 		assert_eq!(bitbuf.read_byte(), Some(50));
 		assert_eq!(bitbuf.read_byte(), None);
@@ -45,7 +44,7 @@ test!(
 		bitbuf.write_uint(12_u16, 15);
 		bitbuf.write_uint(u16::MAX, 16);
 
-		let mut bitbuf = BitVecReader::<Endian>::new(bitbuf.into_bitvec());
+		let mut bitbuf = BitVecReader::<Endian>::from_bytes(bitbuf.into_bytes());
 		assert_eq!(bitbuf.read_uint(12), Some(69_u16));
 		assert_eq!(bitbuf.read_uint(15), Some(12_u16));
 		assert_eq!(bitbuf.read_uint(16), Some(u16::MAX));
@@ -64,7 +63,7 @@ test!(
 		bitbuf.write_int(-12_i16, 15);
 		bitbuf.write_int(i16::MIN, 16);
 
-		let mut bitbuf = BitVecReader::<Endian>::new(bitbuf.into_bitvec());
+		let mut bitbuf = BitVecReader::<Endian>::from_bytes(bitbuf.into_bytes());
 		assert_eq!(bitbuf.read_int(14), Some(-69_i16));
 		assert_eq!(bitbuf.read_int(15), Some(-12_i16));
 		assert_eq!(bitbuf.read_int(16), Some(i16::MIN));
@@ -84,7 +83,7 @@ test!(
 		bitbuf.write_float(f32::MAX);
 		bitbuf.write_float(f32::MIN);
 
-		let mut bitbuf = BitVecReader::<Endian>::new(bitbuf.into_bitvec());
+		let mut bitbuf = BitVecReader::<Endian>::from_bytes(bitbuf.into_bytes());
 		assert_eq!(bitbuf.read_float(), Some(69.69_f32));
 		assert_eq!(bitbuf.read_float(), Some(0.01_f32));
 		assert_eq!(bitbuf.read_float(), Some(f32::MAX));
@@ -106,7 +105,7 @@ test!(
 		bitbuf.write_float(f64::MAX);
 		bitbuf.write_float(f64::MIN);
 
-		let mut bitbuf = BitVecReader::<Endian>::new(bitbuf.into_bitvec());
+		let mut bitbuf = BitVecReader::<Endian>::from_bytes(bitbuf.into_bytes());
 		assert_eq!(bitbuf.read_float(), Some(69.69_f64));
 		assert_eq!(bitbuf.read_float(), Some(0.01_f64));
 		assert_eq!(bitbuf.read_float(), Some(f64::MAX));
@@ -130,7 +129,7 @@ test!(
 		bitbuf.write_string_nul("Hello, world!");
 		bitbuf.write_string_nul("Hello, world!");
 
-		let mut bitbuf = BitVecReader::<Endian>::new(bitbuf.into_bitvec());
+		let mut bitbuf = BitVecReader::<Endian>::from_bytes(bitbuf.into_bytes());
 		assert_eq!(
 			bitbuf.read_string("Hello, world!".len()),
 			Some(Ok("Hello, world!".to_string()))
@@ -168,10 +167,26 @@ test!(
 		let mut bitbuf = BitVecWriter::<Endian>::default();
 		bitbuf.write_bytes(b"Hello, world!");
 
-		let mut bitbuf = BitVecReader::<Endian>::new(bitbuf.into_bitvec());
+		let mut bitbuf = BitVecReader::<Endian>::from_bytes(bitbuf.into_bytes());
 		assert_eq!(
 			bitbuf.read_bytes(b"Hello, world!".len()),
 			Some(b"Hello, world!".to_vec())
 		);
+	}
+);
+
+test!(
+	test_read_alignment_lsb,
+	test_read_alignment_msb,
+	bench_read_alignment_lsb,
+	bench_read_alignment_msb,
+	{
+		let mut bitbuf = BitVecWriter::<Endian>::default();
+		bitbuf.write_uint(162_u16, 16);
+		bitbuf.write_bit(true);
+
+		let mut bitbuf = BitVecReader::<Endian>::from_bytes(bitbuf.into_bytes());
+		assert_eq!(bitbuf.read_uint(16), Some(162_u16));
+		assert_eq!(bitbuf.read_bit(), Some(true));
 	}
 );

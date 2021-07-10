@@ -1,15 +1,10 @@
-use bitvec::{
-	macros::internal::funty::{IsFloat, IsNumber, IsSigned, IsUnsigned},
-	order::{BitOrder, Lsb0, Msb0},
-	vec::BitVec,
-	view::{AsBits, BitView},
-};
+use bitvec::{macros::internal::funty::{IsFloat, IsNumber, IsSigned, IsUnsigned}, order::{BitOrder, Lsb0, Msb0}, slice::BitSlice, store::BitStore, vec::BitVec, view::{AsBits, BitView}};
 
 use crate::BitCount;
 
 #[derive(Debug, Clone, Default)]
 pub struct BitVecWriter<O: BitOrder> {
-	pub cursor: usize,
+	cursor: usize,
 	pub bitvec: BitVec<O, u8>,
 }
 impl<O: BitOrder> BitVecWriter<O> {
@@ -55,8 +50,22 @@ impl<O: BitOrder> BitVecWriter<O> {
 	}
 
 	#[inline]
-	pub fn rewind(&mut self, n: usize) {
-		self.cursor -= n;
+	pub fn cursor(&self) -> usize {
+		self.cursor
+	}
+
+	/// Sets the bit at the given index. Will panic if the index is out of bounds.
+	#[inline]
+	pub fn set_bit(&mut self, index: usize, bit: bool) {
+		self.bitvec.set(index, bit);
+	}
+
+	/// Sets the bits at the given index. Will panic if the index is out of bounds.
+	#[inline]
+	pub fn set_bits<T: BitStore>(&mut self, index: usize, bits: &BitSlice<O, T>) {
+		for (i, bit) in bits.iter().enumerate() {
+			self.bitvec.set(index + i, *bit);
+		}
 	}
 
 	#[inline]

@@ -1,6 +1,6 @@
 [package]
 name = "bitvecbuf"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["William Venner <william@venner.io>"]
 edition = "2018"
 description = "Rust BitBuffer implemented around BitVec"
@@ -8,7 +8,7 @@ license = "MIT"
 repository = "https://github.com/WilliamVenner/bitvecbuf"
 
 [dependencies]
-bitvec = "0.22.3"
+bitvec = "0.22"
 
 [features]
 nightly = []

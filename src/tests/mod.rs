@@ -87,3 +87,18 @@ fn test_empty_bitbuf() {
 	let bitbuf = BitVecWriter::<Lsb0>::default();
 	assert_eq!(bitbuf.into_bytes(), &[]);
 }
+
+
+#[test]
+fn test_set_bits() {
+	use crate::{BitVecWriter, BitVecReader};
+	use bitvec::prelude::Lsb0;
+	use bitvec::view::BitView;
+
+	let mut bitbuf = BitVecWriter::<Lsb0>::default();
+	bitbuf.write_uint(69_u32, 32);
+	bitbuf.set_bits(0, 420_u32.view_bits());
+
+	let mut bitbuf = BitVecReader::<Lsb0>::from_bytes(bitbuf.into_bytes());
+	assert_eq!(bitbuf.read_uint(32), Some(420_u32));
+}
