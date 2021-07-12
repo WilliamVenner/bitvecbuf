@@ -58,7 +58,6 @@ test!(
 	}
 );
 
-#[cfg(target_pointer_width = "64")]
 test!(
 	test_write_double_lsb,
 	test_write_double_msb,
@@ -69,7 +68,7 @@ test!(
 	&[64, 81, 64, 0, 0, 0, 0, 0],
 	{
 		let mut bitbuf = BitVecWriter::<Endian>::default();
-		bitbuf.write_float(69_f64);
+		bitbuf.write_double(69_f64);
 		assert_eq!(bitbuf.into_bytes(), result);
 	}
 );

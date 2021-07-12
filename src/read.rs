@@ -156,14 +156,21 @@ where
 	}
 
 	#[inline]
-	pub fn read_float<N>(&mut self) -> Option<N>
-	where
-		N: FromBitMemory + IsNumber + IsFloat,
-	{
-		let float = self.read_bits(N::BIT_COUNT)?;
-		let float: Option<N> = Some(float.load_bits())
-			.map(|float: <N as FromBitMemory>::Unsigned| N::from_bitmemory(float, N::BIT_COUNT));
-		self.advance(N::BIT_COUNT);
+	pub fn read_float(&mut self) -> Option<f32> {
+		let float = self.read_bits(f32::BIT_COUNT)?;
+		let float: Option<f32> = Some(float.load_bits())
+			.map(|float: <f32 as FromBitMemory>::Unsigned| f32::from_bitmemory(float, f32::BIT_COUNT));
+		self.advance(f32::BIT_COUNT);
+		float
+	}
+
+	#[cfg(target_pointer_width = "64")]
+	#[inline]
+	pub fn read_double(&mut self) -> Option<f64> {
+		let float = self.read_bits(f64::BIT_COUNT)?;
+		let float: Option<f64> = Some(float.load_bits())
+			.map(|float: <f64 as FromBitMemory>::Unsigned| f64::from_bitmemory(float, f64::BIT_COUNT));
+		self.advance(f64::BIT_COUNT);
 		float
 	}
 
@@ -224,6 +231,29 @@ where
 			}
 		}
 		Some(String::from_utf8_lossy(&string).into_owned())
+	}
+}
+
+impl BitVecReader<Msb0> {
+	#[cfg(target_pointer_width = "32")]
+	#[inline]
+	pub fn read_double(&mut self) -> Option<f64> {
+		let double1 = self.read_uint::<u32>(32)? as u64;
+		let double2 = self.read_uint::<u32>(32)? as u64;
+		let double = (double1 << 32) + double2;
+		let double: f64 = unsafe { std::mem::transmute(double) };
+		Some(double)
+	}
+}
+impl BitVecReader<Lsb0> {
+	#[cfg(target_pointer_width = "32")]
+	#[inline]
+	pub fn read_double(&mut self) -> Option<f64> {
+		let double1 = self.read_uint::<u32>(32)? as u64;
+		let double2 = self.read_uint::<u32>(32)? as u64;
+		let double = (double2 << 32) + double1;
+		let double: f64 = unsafe { std::mem::transmute(double) };
+		Some(double)
 	}
 }
 

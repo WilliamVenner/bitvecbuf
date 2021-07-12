@@ -88,14 +88,20 @@ impl<O: BitOrder> BitVecWriter<O> {
 		self.advance(bits.len());
 	}
 
-	pub fn write_float<N>(&mut self, float: N)
-	where
-		N: IsNumber + IsFloat + IntoBitView,
-	{
+	pub fn write_float(&mut self, float: f32) {
 		let float = float.into_bitview();
 		let bits = float.view_bits();
 		self.bitvec
-			.extend_from_bitslice::<O, <<N as IntoBitView>::Unsigned as BitView>::Store>(bits);
+			.extend_from_bitslice::<O, <<f32 as IsFloat>::Raw as BitView>::Store>(bits);
+		self.advance(bits.len());
+	}
+
+	#[cfg(target_pointer_width = "64")]
+	pub fn write_double(&mut self, double: f64) {
+		let double = double.into_bitview();
+		let bits = double.view_bits();
+		self.bitvec
+			.extend_from_bitslice::<O, <<f64 as IsFloat>::Raw as BitView>::Store>(bits);
 		self.advance(bits.len());
 	}
 
@@ -132,6 +138,17 @@ impl BitVecWriter<Msb0> {
 		self.bitvec.extend_from_bitslice::<Msb0, N::Store>(bits);
 		self.advance(bits.len());
 	}
+
+	#[cfg(target_pointer_width = "32")]
+	pub fn write_double(&mut self, double: f64) {
+		// Split the f64 into two u32s
+		const MASK_64_32: u64 = 0x00000000FFFFFFFF;
+		let double: u64 = unsafe { std::mem::transmute(double) };
+		let double1: u32 = ((double >> 32) & MASK_64_32) as u32;
+		let double2: u32 = (double & MASK_64_32) as u32;
+		self.write_uint(double1, 32);
+		self.write_uint(double2, 32);
+	}
 }
 impl BitVecWriter<Lsb0> {
 	pub fn write_int<N>(&mut self, int: N, bits: usize)
@@ -152,6 +169,17 @@ impl BitVecWriter<Lsb0> {
 		let bits = &uint.view_bits()[..bits];
 		self.bitvec.extend_from_bitslice::<Lsb0, N::Store>(bits);
 		self.advance(bits.len());
+	}
+
+	#[cfg(target_pointer_width = "32")]
+	pub fn write_double(&mut self, double: f64) {
+		// Split the f64 into two u32s
+		const MASK_64_32: u64 = 0x00000000FFFFFFFF;
+		let double: u64 = unsafe { std::mem::transmute(double) };
+		let double1: u32 = ((double >> 32) & MASK_64_32) as u32;
+		let double2: u32 = (double & MASK_64_32) as u32;
+		self.write_uint(double2, 32); // SWAPPED ORDER
+		self.write_uint(double1, 32);
 	}
 }
 

@@ -92,7 +92,6 @@ test!(
 	}
 );
 
-#[cfg(target_pointer_width = "64")]
 test!(
 	test_read_double_lsb,
 	test_read_double_msb,
@@ -100,17 +99,17 @@ test!(
 	bench_read_double_msb,
 	{
 		let mut bitbuf = BitVecWriter::<Endian>::default();
-		bitbuf.write_float(69.69_f64);
-		bitbuf.write_float(0.01_f64);
-		bitbuf.write_float(f64::MAX);
-		bitbuf.write_float(f64::MIN);
+		bitbuf.write_double(69.69_f64);
+		bitbuf.write_double(0.01_f64);
+		bitbuf.write_double(f64::MAX);
+		bitbuf.write_double(f64::MIN);
 
 		let mut bitbuf = BitVecReader::<Endian>::from_bytes(bitbuf.into_bytes());
-		assert_eq!(bitbuf.read_float(), Some(69.69_f64));
-		assert_eq!(bitbuf.read_float(), Some(0.01_f64));
-		assert_eq!(bitbuf.read_float(), Some(f64::MAX));
-		assert_eq!(bitbuf.read_float(), Some(f64::MIN));
-		assert_eq!(bitbuf.read_float(), None::<f64>);
+		assert_eq!(bitbuf.read_double(), Some(69.69_f64));
+		assert_eq!(bitbuf.read_double(), Some(0.01_f64));
+		assert_eq!(bitbuf.read_double(), Some(f64::MAX));
+		assert_eq!(bitbuf.read_double(), Some(f64::MIN));
+		assert_eq!(bitbuf.read_double(), None::<f64>);
 	}
 );
 
